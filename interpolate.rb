@@ -3,6 +3,7 @@
 require 'fileutils'
 
 #https://docs.docker.com/compose/compose-file/#variable-substitution
+#https://www.balena.io/docs/reference/supervisor/docker-compose/
 #Balena doesn't support compose substitution so we'll do it ourselves!
 
 mapping = {}
