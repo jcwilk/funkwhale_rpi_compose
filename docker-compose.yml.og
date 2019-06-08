@@ -40,8 +40,8 @@ services:
     environment:
       - C_FORCE_ROOT=true
     volumes:
-      - "${MUSIC_DIRECTORY_SERVE_PATH-/srv/funkwhale/data/music}:${MUSIC_DIRECTORY_PATH-/music}:ro"
-      - "${MEDIA_ROOT}:${MEDIA_ROOT}"
+      - "data-serve-music:${MUSIC_DIRECTORY_PATH-/music}:ro"
+      - "data-media-root:${MEDIA_ROOT}"
 
   celerybeat:
     restart: unless-stopped
@@ -64,10 +64,10 @@ services:
       - redis
     env_file: .env
     volumes:
-      - "${MUSIC_DIRECTORY_SERVE_PATH-/srv/funkwhale/data/music}:${MUSIC_DIRECTORY_PATH-/music}:ro"
-      - "${MEDIA_ROOT}:${MEDIA_ROOT}"
-      - "${STATIC_ROOT}:${STATIC_ROOT}"
-      - "${FUNKWHALE_FRONTEND_PATH}:/frontend"
+      - "data-serve-music:${MUSIC_DIRECTORY_PATH-/music}:ro"
+      - "data-media-root:${MEDIA_ROOT}"
+      - "data-serve-static:${STATIC_ROOT}"
+      - "data-funkwhale-frontend:/frontend"
     ports:
       - "5000"
 
@@ -86,10 +86,10 @@ services:
     volumes:
       - "./nginx/funkwhale.template:/etc/nginx/conf.d/funkwhale.template:ro"
       - "./nginx/funkwhale_proxy.conf:/etc/nginx/funkwhale_proxy.conf:ro"
-      - "${MUSIC_DIRECTORY_SERVE_PATH-/srv/funkwhale/data/music}:${MUSIC_DIRECTORY_SERVE_PATH-/srv/funkwhale/data/music}:ro"
-      - "${MEDIA_ROOT}:${MEDIA_ROOT}:ro"
-      - "${STATIC_ROOT}:${STATIC_ROOT}:ro"
-      - "${FUNKWHALE_FRONTEND_PATH}:/frontend:ro"
+      - "data-serve-music:${MUSIC_DIRECTORY_SERVE_PATH-/srv/funkwhale/data/music}:ro"
+      - "data-media-root:${MEDIA_ROOT}:ro"
+      - "data-serve-static:${STATIC_ROOT}:ro"
+      - "data-funkwhale-frontend:/frontend:ro"
     ports:
       # override those variables in your .env file if needed
       - "${FUNKWHALE_API_IP}:${FUNKWHALE_API_PORT}:80"
@@ -99,6 +99,15 @@ services:
         > /etc/nginx/conf.d/default.conf
         && cat /etc/nginx/conf.d/default.conf
         && nginx -g 'daemon off;'"
+
+volumes:
+  data-music-volume:
+  data-media-volume:
+  data-postgresql:
+  data-serve-music:
+  data-media-root:
+  data-serve-static:
+  data-funkwhale-frontend:
 
 networks:
   default:
