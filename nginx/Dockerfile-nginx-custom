@@ -1,0 +1,3 @@
+FROM nginx
+COPY ./funkwhale.template  /etc/nginx/conf.d/funkwhale.template
+COPY ./funkwhale_proxy.conf /etc/nginx/funkwhale_proxy.conf

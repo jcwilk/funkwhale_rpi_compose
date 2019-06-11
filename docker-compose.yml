@@ -5,7 +5,6 @@ services:
     restart: unless-stopped
     networks:
       - default
-    env_file: .env
     image: postgres:11
     volumes:
       - "data-postgres:/var/lib/postgresql/data"
@@ -14,7 +13,6 @@ services:
     restart: unless-stopped
     networks:
       - default
-    env_file: .env
     image: redis:3
     volumes:
       - "data-redis:/data"
@@ -43,7 +41,6 @@ services:
     depends_on:
       - postgres
       - redis
-    env_file: .env
     command: celery -A funkwhale_api.taskapp beat -l INFO
 
   api:
@@ -54,7 +51,6 @@ services:
     depends_on:
       - postgres
       - redis
-    env_file: .env
     volumes:
       - "data-serve-music:/srv/funkwhale/data/music:ro"
       - "data-media-root:/srv/funkwhale/data/media"
@@ -65,18 +61,16 @@ services:
 
   nginx:
     restart: unless-stopped
-    image: nginx
+    build:
+      context: "./nginx"
+      dockerfile: Dockerfile-nginx-custom
     networks:
       - default
     depends_on:
       - api
-    env_file:
-      - .env
     environment:
       - "NGINX_MAX_BODY_SIZE=100M"
     volumes:
-      # - "./nginx/funkwhale.template:/etc/nginx/conf.d/funkwhale.template:ro"
-      # - "./nginx/funkwhale_proxy.conf:/etc/nginx/funkwhale_proxy.conf:ro"
       - "data-serve-music:/srv/funkwhale/data/music:ro"
       - "data-media-root:/srv/funkwhale/data/media:ro"
       - "data-serve-static:/srv/funkwhale/data/static:ro"
